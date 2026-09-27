@@ -1,0 +1,17 @@
+<launch>
+  <!-- Dobot Project Vision Launcher (ROS 1) -->
+  <arg name="video_device" default="/dev/video0"/>
+  <arg name="usb_cam_yaml" default="$(find dobot_project)/config/usb_cam.yaml"/>
+  <arg name="cube_detector_yaml" default="$(find dobot_project)/config/cube_detector.yaml"/>
+
+  <!-- USB Camera Node -->
+  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" respawn="true">
+    <param name="video_device" value="$(arg video_device)"/>
+    <rosparam command="load" file="$(arg usb_cam_yaml)"/>
+  </node>
+
+  <!-- Cube Detector Node -->
+  <node name="cube_detector" pkg="dobot_project" type="cube_detector.py" output="screen" respawn="true">
+    <rosparam command="load" file="$(arg cube_detector_yaml)"/>
+  </node>
+</launch>

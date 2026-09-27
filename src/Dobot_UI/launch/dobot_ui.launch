@@ -1,0 +1,10 @@
+<launch>
+  <!-- Dobot UI Launcher for ROS 1 -->
+  <arg name="mock_mode" default="false" doc="Whether to run UI in simulation/mock mode"/>
+  <arg name="ui_config_file" default="$(find Dobot_UI)/config/dobot_ui.yaml" doc="Path to UI configuration YAML"/>
+
+  <node name="dobot_ui" pkg="Dobot_UI" type="app.py" output="screen" respawn="false">
+    <param name="mock_mode" value="$(arg mock_mode)"/>
+    <rosparam command="load" file="$(arg ui_config_file)"/>
+  </node>
+</launch>

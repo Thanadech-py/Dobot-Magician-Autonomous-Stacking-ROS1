@@ -1,0 +1,24 @@
+# ROS build artifacts
+build/
+devel/
+install/
+log/
+.catkin_workspace
+.catkin_tools/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Camera snapshots
+snapshots/
