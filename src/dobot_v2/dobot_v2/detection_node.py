@@ -13,11 +13,18 @@ Subsystems:
 """
 
 import os
+import sys
 import time
 import json
 import yaml
 import cv2
 import numpy as np
+
+# Ensure package directory is on sys.path for direct execution
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 try:
     import rospy
@@ -97,13 +104,17 @@ def load_yaml_config(logger=None) -> dict:
             try:
                 with open(os.path.realpath(path), 'r', encoding='utf-8') as f:
                     raw = yaml.safe_load(f)
+                if not isinstance(raw, dict):
+                    continue
                 for root in ['/**', 'detection_node']:
-                    if root in raw and 'ros__parameters' in raw[root]:
+                    if root in raw and isinstance(raw[root], dict) and 'ros__parameters' in raw[root]:
                         if logger:
                             logger.info(f'Loaded parameter configuration from: {path}')
                         return raw[root]['ros__parameters']
-                if 'ros__parameters' in raw:
+                if 'ros__parameters' in raw and isinstance(raw['ros__parameters'], dict):
                     return raw['ros__parameters']
+                if logger:
+                    logger.info(f'Loaded parameter configuration from: {path}')
                 return raw
             except Exception as e:
                 if logger:
@@ -147,13 +158,29 @@ class DetectionNode:
 
         # Read any parameter overrides from ROS parameter server
         if HAS_ROS1:
-            for k in list(yaml_defaults.keys()):
-                if rospy.has_param(f'~{k}'):
-                    val = rospy.get_param(f'~{k}')
-                    if isinstance(val, list) and len(val) > 0 and isinstance(val[0], (int, float)):
-                        cfg[k] = [float(x) for x in val]
-                    else:
-                        cfg[k] = val
+            try:
+                for k in list(yaml_defaults.keys()):
+                    if rospy.has_param(f'~{k}'):
+                        val = rospy.get_param(f'~{k}')
+                        if isinstance(val, list) and len(val) > 0 and isinstance(val[0], (int, float)):
+                            cfg[k] = [float(x) for x in val]
+                        else:
+                            cfg[k] = val
+                private_params = rospy.get_param('~', {})
+                if isinstance(private_params, dict):
+                    for k, val in private_params.items():
+                        if k not in cfg:
+                            cfg[k] = val
+            except Exception as e:
+                self._logger.warn(f'Error reading ROS parameter overrides: {e}')
+
+        # Robust fallbacks for image streaming
+        cfg.setdefault('image_topic', '/usb_cam/image_raw')
+        cfg.setdefault('camera_info_topic', '/usb_cam/camera_info')
+        cfg.setdefault('publish_raw_image', True)
+        cfg.setdefault('publish_compressed_image', True)
+        cfg.setdefault('show_overlay', True)
+        cfg.setdefault('publish_rate', 30.0)
 
         # Format feeders
         cfg['feeder_positions'] = [
@@ -182,8 +209,8 @@ class DetectionNode:
         self.sub_corners = rospy.Subscriber('set_grid_corners', String, self._on_set_corners, queue_size=10)
 
         # Output publishers
-        self.pub_comp = rospy.Publisher('detected_objects_image/compressed', CompressedImage, queue_size=10)
-        self.pub_raw = rospy.Publisher('detected_objects_image', Image, queue_size=10) if self.cfg.get('publish_raw_image', False) else None
+        self.pub_comp = rospy.Publisher('detected_objects_image/compressed', CompressedImage, queue_size=10) if self.cfg.get('publish_compressed_image', True) else None
+        self.pub_raw = rospy.Publisher('detected_objects_image', Image, queue_size=10) if self.cfg.get('publish_raw_image', True) else None
         self.pub_json = rospy.Publisher('detected_objects', String, queue_size=10)
         self.pub_poses_robot = rospy.Publisher('detected_objects_poses', PoseArray, queue_size=10)
         self.pub_poses_grid = rospy.Publisher('grid_local_poses', PoseArray, queue_size=10)
@@ -202,7 +229,19 @@ class DetectionNode:
     def _on_raw_img(self, msg: Image):
         if self._should_throttle():
             return
-        frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        frame = None
+        try:
+            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        except Exception:
+            pass
+        if frame is None:
+            try:
+                frame = np.frombuffer(msg.data, dtype=np.uint8).reshape((msg.height, msg.width, -1))
+                if getattr(msg, 'encoding', '') == 'rgb8':
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            except Exception as e:
+                self._logger.warn(f'Failed to decode raw image frame: {e}')
+                return
         if frame is not None:
             self._process(frame, msg.header)
 
@@ -245,12 +284,15 @@ class DetectionNode:
                 (self.pub_comp is not None and self.pub_comp.get_num_connections() > 0) or
                 (self.pub_raw is not None and self.pub_raw.get_num_connections() > 0)
             )
-            if self.cfg.get('show_overlay', True) and has_subscribers:
-                pct = int(min(100, (self.grid_detector.stable_counter / max(1, self.grid_detector.lock_threshold)) * 100))
-                vis = DetectionVisualizer.draw(
-                    frame, self.transform, corners, detected_objects, counts,
-                    self.grid_detector.is_locked, pct
-                )
+            if has_subscribers:
+                if self.cfg.get('show_overlay', True):
+                    pct = int(min(100, (self.grid_detector.stable_counter / max(1, self.grid_detector.lock_threshold)) * 100))
+                    vis = DetectionVisualizer.draw(
+                        frame, self.transform, corners, detected_objects, counts,
+                        self.grid_detector.is_locked, pct
+                    )
+                else:
+                    vis = frame
                 self._publish_images(vis, header)
         except Exception as e:
             self._logger.error(f'Error in _process: {e}')
@@ -304,6 +346,20 @@ class DetectionNode:
         except Exception as e:
             self._logger.error(f'Error in _publish_data: {e}')
 
+    def _cv2_to_imgmsg(self, cvim: np.ndarray, header=None, encoding: str = 'bgr8') -> Image:
+        """Converts OpenCV numpy image to sensor_msgs/Image reliably without CvBridge OpenCV 5 KeyError."""
+        img_msg = Image()
+        if header is not None:
+            img_msg.header = header
+        img_msg.height = cvim.shape[0]
+        img_msg.width = cvim.shape[1]
+        img_msg.encoding = encoding
+        img_msg.is_bigendian = False
+        channels = 1 if cvim.ndim == 2 else cvim.shape[2]
+        img_msg.step = cvim.shape[1] * channels * cvim.dtype.itemsize
+        img_msg.data = cvim.tobytes()
+        return img_msg
+
     def _publish_images(self, vis: np.ndarray, header):
         try:
             if self.pub_comp is not None and self.pub_comp.get_num_connections() > 0:
@@ -314,7 +370,7 @@ class DetectionNode:
                 self.pub_comp.publish(comp_msg)
 
             if self.pub_raw is not None and self.pub_raw.get_num_connections() > 0:
-                self.pub_raw.publish(self.bridge.cv2_to_imgmsg(vis, encoding='bgr8'))
+                self.pub_raw.publish(self._cv2_to_imgmsg(vis, header=header, encoding='bgr8'))
         except Exception as e:
             self._logger.error(f'Error in _publish_images: {e}')
 

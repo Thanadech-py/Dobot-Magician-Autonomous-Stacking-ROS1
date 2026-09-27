@@ -8,6 +8,7 @@ Includes collision avoidance:
   - Horizontal keepout around Center Goal tower with North/South bypass waypoints
   - Safe vertical clearance Z (> 140 mm) above the growing goal tower
 """
+from __future__ import annotations
 
 import logging
 import math

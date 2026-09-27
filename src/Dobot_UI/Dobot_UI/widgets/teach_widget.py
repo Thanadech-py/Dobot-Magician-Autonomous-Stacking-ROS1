@@ -5,24 +5,14 @@ grid cell, the center drop goal, and feeders. Stored coordinates are saved to
 dobot_ui.yaml and used during mission execution when vision is unavailable.
 """
 
-try:
-    from PyQt6.QtWidgets import (
-        QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
-        QPushButton, QTableWidget, QTableWidgetItem, QHeaderView,
-        QCheckBox, QFrame, QRadioButton, QButtonGroup, QAbstractItemView
-    )
-    from PyQt6.QtCore import Qt, pyqtSignal
-    from PyQt6.QtGui import QColor
-    ALIGN_CENTER = Qt.AlignmentFlag.AlignCenter
-except ImportError:
-    from PyQt5.QtWidgets import (
-        QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
-        QPushButton, QTableWidget, QTableWidgetItem, QHeaderView,
-        QCheckBox, QFrame, QRadioButton, QButtonGroup, QAbstractItemView
-    )
-    from PyQt5.QtCore import Qt, pyqtSignal
-    from PyQt5.QtGui import QColor
-    ALIGN_CENTER = Qt.AlignCenter
+from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
+    QPushButton, QTableWidget, QTableWidgetItem, QHeaderView,
+    QCheckBox, QFrame, QRadioButton, QButtonGroup, QAbstractItemView
+)
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QColor
+ALIGN_CENTER = Qt.AlignCenter
 
 try:
     from ..config import STORED_POSITIONS, TARGET_OPTIONS, save_stored_positions
@@ -73,7 +63,7 @@ class TeachWidget(QWidget):
         self.chk_bypass.setToolTip("When enabled, Stacking Mission uses taught coordinates instead of camera vision")
         self.chk_bypass.setStyleSheet("color: #34d399; font-weight: bold; font-size: 11px;")
         self.chk_bypass.toggled.connect(self._on_bypass_toggled)
-        row_top.addWidget(self.chk_bypass, alignment=Qt.AlignmentFlag.AlignRight if hasattr(Qt, "AlignmentFlag") else Qt.AlignRight)
+        row_top.addWidget(self.chk_bypass, alignment=Qt.AlignRight)
         h_lay.addLayout(row_top)
 
         row_tele = QHBoxLayout()
@@ -83,7 +73,7 @@ class TeachWidget(QWidget):
 
         self.lbl_status = QLabel("Ready")
         self.lbl_status.setStyleSheet("color: #eab308; font-size: 11px; font-weight: bold;")
-        row_tele.addWidget(self.lbl_status, alignment=Qt.AlignmentFlag.AlignRight if hasattr(Qt, "AlignmentFlag") else Qt.AlignRight)
+        row_tele.addWidget(self.lbl_status, alignment=Qt.AlignRight)
         h_lay.addLayout(row_tele)
 
         root.addWidget(header_card)
@@ -92,13 +82,13 @@ class TeachWidget(QWidget):
         self.table = QTableWidget()
         self.table.setColumnCount(4)
         self.table.setHorizontalHeaderLabels(["Target Goal / Cell", "Stored Coordinate (X, Y, Z)", "Teach Pose", "Test Position"])
-        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
-        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
-        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
         self.table.setColumnWidth(2, 105)
         self.table.setColumnWidth(3, 95)
-        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.verticalHeader().setVisible(False)
         self.table.setStyleSheet(
             "QTableWidget { background-color: #0f172a; gridline-color: #334155; border: 1px solid #334155; border-radius: 4px; }"
@@ -192,7 +182,7 @@ class TeachWidget(QWidget):
         for row_idx, (name, key) in enumerate(TARGET_OPTIONS):
             # Column 0: Target Name
             item_name = QTableWidgetItem(name)
-            item_name.setFlags(item_name.flags() & ~Qt.ItemFlag.ItemIsEditable if hasattr(Qt, "ItemFlag") else ~Qt.ItemIsEditable)
+            item_name.setFlags(item_name.flags() & ~Qt.ItemIsEditable)
             if key == "goal":
                 item_name.setForeground(QColor("#eab308"))
             else:

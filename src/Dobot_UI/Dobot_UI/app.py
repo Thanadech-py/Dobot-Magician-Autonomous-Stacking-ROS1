@@ -19,14 +19,7 @@ else:
     from .main_window import DobotMainWindow
     from .ros_bridge import RosBridge
 
-try:
-    from PyQt6.QtWidgets import QApplication
-except ImportError:
-    try:
-        from PyQt5.QtWidgets import QApplication
-    except ImportError:
-        print("Please install PyQt5 or PyQt6: pip install PyQt5")
-        sys.exit(1)
+from PyQt5.QtWidgets import QApplication
 
 try:
     import rospy
@@ -62,7 +55,7 @@ def main(args=None):
     window.show()
 
     bridge.start()
-    ret = app.exec()
+    ret = app.exec_()
     bridge.stop()
 
     if HAS_ROS1:

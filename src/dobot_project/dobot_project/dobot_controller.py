@@ -35,6 +35,7 @@ Parameters (all tunable via YAML / launch args):
   - home_on_start      (bool)  : Whether to home the robot on startup
   - target_frame_id    (str)   : Expected frame_id in pose array (informational)
 """
+from __future__ import annotations
 
 import json
 import math
@@ -117,14 +118,6 @@ class DobotControllerNode:
             queue_size=10
         )
 
-    def get_logger(self):
-        class _Logger:
-            info = staticmethod(rospy.loginfo)
-            warn = staticmethod(rospy.logwarn)
-            warning = staticmethod(rospy.logwarn)
-            error = staticmethod(rospy.logerr)
-        return _Logger
-
         # Mission queue from UI (ordered list of tasks)
         self._mission_tasks: list[dict] = []   # [{color, index, row, col}, ...]
         self._mission_active = False
@@ -134,6 +127,15 @@ class DobotControllerNode:
             f'DobotControllerNode ready. pick_color={self.pick_col!r}, '
             f'suction={self.suction}, hover_z={self.hover_z}, pick_z={self.pick_z}'
         )
+
+    def get_logger(self):
+        class _Logger:
+            info = staticmethod(rospy.loginfo)
+            warn = staticmethod(rospy.logwarn)
+            warning = staticmethod(rospy.logwarn)
+            error = staticmethod(rospy.logerr)
+            fatal = staticmethod(rospy.logfatal)
+        return _Logger
 
 
     # -----------------------------------------------------------------------
@@ -630,9 +632,6 @@ class DobotControllerNode:
             except Exception:
                 pass
             self.get_logger().info('Dobot connection closed.')
-
-    def destroy_node(self):
-        self._disconnect()
 
 
 # ---------------------------------------------------------------------------

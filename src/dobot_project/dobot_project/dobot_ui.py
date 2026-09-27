@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ROS 2 + PyQt6 UI for Dobot Magician Vision Control System.
+ROS 1 + PyQt5 UI for Dobot Magician Vision Control System.
 
 Layout:
   ┌─────────────────────────────────────────────────────────────────────┐
@@ -19,6 +19,7 @@ Layout:
   │  LOG  [INFO|WARN|ERR]  timestamp  message ...                       │
   └─────────────────────────────────────────────────────────────────────┘
 """
+from __future__ import annotations
 
 import sys
 import json
@@ -33,16 +34,16 @@ from std_msgs.msg import String
 import numpy as np
 import cv2
 
-from PyQt6.QtWidgets import (
+from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLabel, QPushButton,
     QComboBox, QGridLayout, QHBoxLayout, QVBoxLayout, QSplitter,
     QTextEdit, QFrame, QSizePolicy, QSpacerItem, QGroupBox,
     QSpinBox, QScrollArea
 )
-from PyQt6.QtCore import (
+from PyQt5.QtCore import (
     Qt, QThread, pyqtSignal, QTimer, QSize, QObject
 )
-from PyQt6.QtGui import (
+from PyQt5.QtGui import (
     QImage, QPixmap, QFont, QColor, QPainter, QPen, QBrush,
     QTextCursor, QPalette
 )
@@ -372,8 +373,8 @@ class GridCell(QFrame):
         self._detected = False
 
         self.setMinimumSize(110, 110)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.setFrameShape(QFrame.Shape.Box)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setFrameShape(QFrame.Box)
         self._build_ui()
         self._refresh_style()
 
@@ -385,16 +386,16 @@ class GridCell(QFrame):
         if self.is_goal:
             # GOAL cell
             self.lbl_title = QLabel("GOAL")
-            self.lbl_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.lbl_title.setFont(QFont("Segoe UI", 10, QFont.Weight.Bold))
+            self.lbl_title.setAlignment(Qt.AlignCenter)
+            self.lbl_title.setFont(QFont("Segoe UI", 10, QFont.Bold))
             self.lbl_title.setStyleSheet(f"color: {ACCENT2}; background: transparent;")
 
             self.lbl_stack = QLabel("Stack: 0")
-            self.lbl_stack.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.lbl_stack.setAlignment(Qt.AlignCenter)
             self.lbl_stack.setStyleSheet(f"color: {TEXT_SEC}; background: transparent; font-size: 11px;")
 
             self.lbl_order = QLabel("")
-            self.lbl_order.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.lbl_order.setAlignment(Qt.AlignCenter)
             self.lbl_order.setStyleSheet(f"color: {TEXT_DIM}; background: transparent; font-size: 10px;")
             self.lbl_order.setWordWrap(True)
 
@@ -436,7 +437,7 @@ class GridCell(QFrame):
 
             # Row 3: detection indicator
             self.lbl_detected = QLabel("⬤ Not detected")
-            self.lbl_detected.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.lbl_detected.setAlignment(Qt.AlignCenter)
             self.lbl_detected.setStyleSheet(f"color: {TEXT_DIM}; font-size: 10px; background: transparent;")
 
             layout.addLayout(top_row)
@@ -608,9 +609,9 @@ class CameraView(QGroupBox):
         lay.setContentsMargins(4, 12, 4, 4)
 
         self.lbl = QLabel()
-        self.lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl.setAlignment(Qt.AlignCenter)
         self.lbl.setMinimumSize(480, 360)
-        self.lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.lbl.setStyleSheet(
             f"background: #000010; border: 1px solid {BORDER}; border-radius: 6px;"
         )
@@ -618,7 +619,7 @@ class CameraView(QGroupBox):
         lay.addWidget(self.lbl)
 
         self.lbl_info = QLabel("No signal")
-        self.lbl_info.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl_info.setAlignment(Qt.AlignCenter)
         self.lbl_info.setStyleSheet(f"color: {TEXT_DIM}; font-size: 11px;")
         lay.addWidget(self.lbl_info)
 
@@ -628,18 +629,18 @@ class CameraView(QGroupBox):
         p = QPainter(pm)
         p.setPen(QPen(QColor(BORDER), 2))
         p.setFont(QFont("Segoe UI", 14))
-        p.drawText(pm.rect(), Qt.AlignmentFlag.AlignCenter, "No Camera Signal")
+        p.drawText(pm.rect(), Qt.AlignCenter, "No Camera Signal")
         p.end()
         self.lbl.setPixmap(pm)
 
     def update_frame(self, frame: np.ndarray):
         h, w, ch = frame.shape
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        qi = QImage(rgb.data, w, h, ch * w, QImage.Format.Format_RGB888)
+        qi = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
         pm = QPixmap.fromImage(qi)
         # Scale to fit label while keeping aspect ratio
-        pm = pm.scaled(self.lbl.size(), Qt.AspectRatioMode.KeepAspectRatio,
-                        Qt.TransformationMode.SmoothTransformation)
+        pm = pm.scaled(self.lbl.size(), Qt.KeepAspectRatio,
+                        Qt.SmoothTransformation)
         self.lbl.setPixmap(pm)
         self.lbl_info.setText(f"{w}×{h} | {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
 
@@ -745,7 +746,7 @@ class StatusDot(QLabel):
         c = SUCCESS if self._ok else ERROR
         self.setText(f'<span style="color:{c}; font-size:16px;">⬤</span>'
                      f'<span style="color:{TEXT_SEC}; font-size:12px;"> {self._label}</span>')
-        self.setTextFormat(Qt.TextFormat.RichText)
+        self.setTextFormat(Qt.RichText)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -771,7 +772,7 @@ class DobotMainWindow(QMainWindow):
 
         # Start ROS bridge
         self._ros_worker.start()
-        self._log("INFO", "System", "UI started. Connecting to ROS 2...")
+        self._log("INFO", "System", "UI started. Connecting to ROS 1...")
 
     # ── Build UI ──────────────────────────────────────────────────────────
 
@@ -786,7 +787,7 @@ class DobotMainWindow(QMainWindow):
         root.addWidget(self._make_toolbar())
 
         # ── Main body ──
-        splitter_h = QSplitter(Qt.Orientation.Horizontal)
+        splitter_h = QSplitter(Qt.Horizontal)
         splitter_h.setHandleWidth(4)
 
         # Left: camera
@@ -820,7 +821,7 @@ class DobotMainWindow(QMainWindow):
         splitter_h.setSizes([680, 560])
 
         # ── Vertical splitter (main body / log) ──
-        splitter_v = QSplitter(Qt.Orientation.Vertical)
+        splitter_v = QSplitter(Qt.Vertical)
         splitter_v.setHandleWidth(4)
         splitter_v.addWidget(splitter_h)
 
@@ -842,12 +843,12 @@ class DobotMainWindow(QMainWindow):
 
         # Title
         title = QLabel("DOBOT VISION CONTROL")
-        title.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
+        title.setFont(QFont("Segoe UI", 14, QFont.Bold))
         title.setStyleSheet(f"color: {ACCENT2}; background: transparent; border: none;")
         lay.addWidget(title)
 
         sep = QFrame()
-        sep.setFrameShape(QFrame.Shape.VLine)
+        sep.setFrameShape(QFrame.VLine)
         sep.setStyleSheet(f"color: {BORDER};")
         lay.addWidget(sep)
 
@@ -860,7 +861,7 @@ class DobotMainWindow(QMainWindow):
         lay.addWidget(self.dot_ros)
 
         sep2 = QFrame()
-        sep2.setFrameShape(QFrame.Shape.VLine)
+        sep2.setFrameShape(QFrame.VLine)
         sep2.setStyleSheet(f"color: {BORDER};")
         lay.addWidget(sep2)
 
@@ -1008,23 +1009,23 @@ def main(args=None):
 
     # Apply dark palette as base so native widgets inherit it
     palette = QPalette()
-    palette.setColor(QPalette.ColorRole.Window,          QColor(BG_DARK))
-    palette.setColor(QPalette.ColorRole.WindowText,      QColor(TEXT_PRI))
-    palette.setColor(QPalette.ColorRole.Base,            QColor(BG_PANEL))
-    palette.setColor(QPalette.ColorRole.AlternateBase,   QColor(BG_CARD))
-    palette.setColor(QPalette.ColorRole.ToolTipBase,     QColor(BG_WIDGET))
-    palette.setColor(QPalette.ColorRole.ToolTipText,     QColor(TEXT_PRI))
-    palette.setColor(QPalette.ColorRole.Text,            QColor(TEXT_PRI))
-    palette.setColor(QPalette.ColorRole.Button,          QColor(BG_CARD))
-    palette.setColor(QPalette.ColorRole.ButtonText,      QColor(TEXT_PRI))
-    palette.setColor(QPalette.ColorRole.BrightText,      QColor(ACCENT))
-    palette.setColor(QPalette.ColorRole.Highlight,       QColor(ACCENT2))
-    palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#ffffff"))
+    palette.setColor(QPalette.Window,          QColor(BG_DARK))
+    palette.setColor(QPalette.WindowText,      QColor(TEXT_PRI))
+    palette.setColor(QPalette.Base,            QColor(BG_PANEL))
+    palette.setColor(QPalette.AlternateBase,   QColor(BG_CARD))
+    palette.setColor(QPalette.ToolTipBase,     QColor(BG_WIDGET))
+    palette.setColor(QPalette.ToolTipText,     QColor(TEXT_PRI))
+    palette.setColor(QPalette.Text,            QColor(TEXT_PRI))
+    palette.setColor(QPalette.Button,          QColor(BG_CARD))
+    palette.setColor(QPalette.ButtonText,      QColor(TEXT_PRI))
+    palette.setColor(QPalette.BrightText,      QColor(ACCENT))
+    palette.setColor(QPalette.Highlight,       QColor(ACCENT2))
+    palette.setColor(QPalette.HighlightedText, QColor("#ffffff"))
     app.setPalette(palette)
 
     win = DobotMainWindow()
     win.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':

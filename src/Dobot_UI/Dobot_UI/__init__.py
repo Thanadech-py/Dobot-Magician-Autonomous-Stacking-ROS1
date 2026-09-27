@@ -1,5 +1,5 @@
 """
-Dobot_UI: ROS 2 PyQt6 User Interface for Dobot Magician Mission Control.
+Dobot_UI: ROS 1 PyQt5 User Interface for Dobot Magician Mission Control.
 Provides video visualization from detection_node in dobot_v2,
 Dobot robot status telemetry, and interactive 8-cube stacking sequence mission planner.
 """

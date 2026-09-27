@@ -205,16 +205,24 @@ class GridDetector:
             return
         flat = [round(float(c), 1) for pt in self.grid_corners for c in pt]
         paths = [
+            os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "config", "detection_node.yaml")),
+            os.path.expanduser("~/catkin_ws/src/dobot_v2/config/detection_node.yaml"),
             os.path.expanduser("~/dobot_ws/src/dobot_v2/config/detection_node.yaml"),
-            os.path.expanduser("~/dobot_ws/install/dobot_v2/share/dobot_v2/config/detection_node.yaml")
         ]
+        try:
+            import rospkg
+            rp = rospkg.RosPack()
+            paths.insert(0, os.path.join(rp.get_path("dobot_v2"), "config", "detection_node.yaml"))
+        except Exception:
+            pass
+
         for p in paths:
             try:
                 rp = os.path.realpath(p)
                 if os.path.exists(rp):
                     with open(rp, 'r') as f:
                         content = f.read()
-                    new_line = f"    grid_corners: {flat}"
+                    new_line = f"grid_corners: {flat}"
                     updated = re.sub(r"^\s*grid_corners:\s*\[.*?\]", new_line, content, flags=re.MULTILINE)
                     with open(rp, 'w') as f:
                         f.write(updated)

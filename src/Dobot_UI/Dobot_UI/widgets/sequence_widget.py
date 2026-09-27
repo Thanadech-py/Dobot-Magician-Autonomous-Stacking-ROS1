@@ -3,21 +3,14 @@ Phase 1: Clear Obstacles to Feeders 1..4
 Phase 2: Stack Goal Blocks (Locked to Max 4)
 Phase 3: Restore Obstacles from Feeders 1..4 to Origin Positions
 """
+from __future__ import annotations
 
-try:
-    from PyQt6.QtWidgets import (
-        QGroupBox, QVBoxLayout, QHBoxLayout, QTableWidget,
-        QTableWidgetItem, QHeaderView, QPushButton, QLabel,
-        QAbstractItemView
-    )
-    from PyQt6.QtGui import QColor
-except ImportError:
-    from PyQt5.QtWidgets import (
-        QGroupBox, QVBoxLayout, QHBoxLayout, QTableWidget,
-        QTableWidgetItem, QHeaderView, QPushButton, QLabel,
-        QAbstractItemView
-    )
-    from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import (
+    QGroupBox, QVBoxLayout, QHBoxLayout, QTableWidget,
+    QTableWidgetItem, QHeaderView, QPushButton, QLabel,
+    QAbstractItemView
+)
+from PyQt5.QtGui import QColor
 
 try:
     from ..config import STACKING
@@ -39,9 +32,9 @@ class SequenceWidget(QGroupBox):
         self.table = QTableWidget()
         self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels(["Phase", "Step", "Movement / Path", "Color", "Target Z"])
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
-        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.verticalHeader().setVisible(False)
         layout.addWidget(self.table)
 

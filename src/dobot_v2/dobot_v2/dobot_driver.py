@@ -1,4 +1,5 @@
 """Low-level hardware driver interface for Dobot Magician using pydobot / pydobot2."""
+from __future__ import annotations
 
 import logging
 import threading

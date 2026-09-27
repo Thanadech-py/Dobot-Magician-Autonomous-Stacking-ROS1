@@ -1,17 +1,10 @@
 """Dobot Magician telemetry widget displaying coordinates and robot state."""
 
-try:
-    from PyQt6.QtWidgets import (
-        QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QFrame
-    )
-    from PyQt6.QtCore import Qt
-    ALIGN_CENTER = Qt.AlignmentFlag.AlignCenter
-except ImportError:
-    from PyQt5.QtWidgets import (
-        QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QFrame
-    )
-    from PyQt5.QtCore import Qt
-    ALIGN_CENTER = Qt.AlignCenter
+from PyQt5.QtWidgets import (
+    QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QFrame
+)
+from PyQt5.QtCore import Qt
+ALIGN_CENTER = Qt.AlignCenter
 
 
 class RobotTelemetryWidget(QGroupBox):

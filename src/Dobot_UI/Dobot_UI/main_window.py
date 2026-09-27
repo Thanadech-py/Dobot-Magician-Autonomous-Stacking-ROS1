@@ -1,17 +1,10 @@
 """Main Window combining video feed, 3x3 grid, sequence table, and telemetry."""
 
-try:
-    from PyQt6.QtWidgets import (
-        QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QMessageBox,
-        QTabWidget
-    )
-    from PyQt6.QtCore import Qt
-except ImportError:
-    from PyQt5.QtWidgets import (
-        QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QMessageBox,
-        QTabWidget
-    )
-    from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QMessageBox,
+    QTabWidget
+)
+from PyQt5.QtCore import Qt
 
 try:
     from .constants import STYLESHEET
@@ -65,7 +58,7 @@ class DobotMainWindow(QMainWindow):
         root.addWidget(self.toolbar)
 
         # 2. Main Splitter: Left (Video + Telemetry) | Right (Tabs: Mission vs Manual)
-        splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter = QSplitter(Qt.Horizontal)
 
         left = QWidget()
         l_lay = QVBoxLayout(left)

@@ -1,4 +1,5 @@
 """Data models and coordinate helpers for the 3x3 grid stacking mission."""
+from __future__ import annotations
 
 try:
     from ..config import GRID, COLOR_HEX  # noqa: F401

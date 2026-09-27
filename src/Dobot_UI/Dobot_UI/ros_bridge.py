@@ -9,12 +9,8 @@ import time
 import cv2
 import numpy as np
 
-try:
-    from PyQt6.QtCore import QThread, pyqtSignal
-    from PyQt6.QtGui import QImage
-except ImportError:
-    from PyQt5.QtCore import QThread, pyqtSignal
-    from PyQt5.QtGui import QImage
+from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtGui import QImage
 
 try:
     import rospy
@@ -105,7 +101,7 @@ class RosBridge(QThread):
             self._fps_count = 0
             self._last_time = now
         h, w, ch = rgb.shape
-        qimg = QImage(rgb.data, w, h, ch * w, QImage.Format.Format_RGB888).copy()
+        qimg = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888).copy()
         self.image_received.emit(qimg, self.fps)
 
     def _on_status(self, msg):

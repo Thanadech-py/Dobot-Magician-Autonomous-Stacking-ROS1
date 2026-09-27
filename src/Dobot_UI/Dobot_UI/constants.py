@@ -4,7 +4,7 @@ STYLESHEET = """
 QWidget {
     background-color: #121824;
     color: #e2e8f0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', 'Noto Color Emoji', 'DejaVu Sans', sans-serif;
     font-size: 12px;
 }
 QGroupBox {

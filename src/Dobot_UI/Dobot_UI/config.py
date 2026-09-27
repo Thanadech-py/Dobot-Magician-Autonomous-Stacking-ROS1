@@ -2,6 +2,7 @@
 
 Loads dobot_ui.yaml from config directory and provides safe fallbacks.
 """
+from __future__ import annotations
 
 import copy
 import logging

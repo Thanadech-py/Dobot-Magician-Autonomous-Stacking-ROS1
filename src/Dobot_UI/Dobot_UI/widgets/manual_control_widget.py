@@ -5,22 +5,13 @@ direct coordinate go-to (PTP), end-effector tool control (suction/gripper),
 and quick presets for testing and manual operation.
 """
 
-try:
-    from PyQt6.QtWidgets import (
-        QWidget, QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
-        QPushButton, QDoubleSpinBox, QSlider, QRadioButton, QButtonGroup,
-        QScrollArea, QFrame
-    )
-    from PyQt6.QtCore import Qt, pyqtSignal
-    ALIGN_CENTER = Qt.AlignmentFlag.AlignCenter
-except ImportError:
-    from PyQt5.QtWidgets import (
-        QWidget, QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
-        QPushButton, QDoubleSpinBox, QSlider, QRadioButton, QButtonGroup,
-        QScrollArea, QFrame
-    )
-    from PyQt5.QtCore import Qt, pyqtSignal
-    ALIGN_CENTER = Qt.AlignCenter
+from PyQt5.QtWidgets import (
+    QWidget, QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
+    QPushButton, QDoubleSpinBox, QSlider, QRadioButton, QButtonGroup,
+    QScrollArea, QFrame
+)
+from PyQt5.QtCore import Qt, pyqtSignal
+ALIGN_CENTER = Qt.AlignCenter
 
 
 class ManualControlWidget(QWidget):
@@ -49,9 +40,8 @@ class ManualControlWidget(QWidget):
     def _init_ui(self):
         scroll = QScrollArea(self)
         scroll.setWidgetResizable(True)
-        scroll_off = Qt.ScrollBarPolicy.ScrollBarAlwaysOff if hasattr(Qt, "ScrollBarPolicy") else Qt.ScrollBarAlwaysOff
-        scroll.setHorizontalScrollBarPolicy(scroll_off)
-        scroll.setFrameShape(QFrame.Shape.NoFrame if hasattr(QFrame, "Shape") else QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setFrameShape(QFrame.NoFrame)
 
         container = QWidget()
         layout = QVBoxLayout(container)

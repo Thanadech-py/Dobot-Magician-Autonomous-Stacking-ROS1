@@ -1,19 +1,12 @@
 """Interactive 3x3 Field Grid widget for assigning cube colors, goal stack orders, and obstacle feeder slots."""
+from __future__ import annotations
 
-try:
-    from PyQt6.QtWidgets import (
-        QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
-        QComboBox, QFrame, QPushButton, QCheckBox
-    )
-    from PyQt6.QtCore import Qt, pyqtSignal
-    ALIGN_CENTER = Qt.AlignmentFlag.AlignCenter
-except ImportError:
-    from PyQt5.QtWidgets import (
-        QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
-        QComboBox, QFrame, QPushButton, QCheckBox
-    )
-    from PyQt5.QtCore import Qt, pyqtSignal
-    ALIGN_CENTER = Qt.AlignCenter
+from PyQt5.QtWidgets import (
+    QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
+    QComboBox, QFrame, QPushButton, QCheckBox
+)
+from PyQt5.QtCore import Qt, pyqtSignal
+ALIGN_CENTER = Qt.AlignCenter
 
 try:
     from ..config import CELL_DEFAULTS, STACKING, STORED_POSITIONS, GRID

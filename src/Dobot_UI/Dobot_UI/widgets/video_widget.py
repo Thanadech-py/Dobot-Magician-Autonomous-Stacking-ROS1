@@ -1,15 +1,9 @@
 """Video feed display widget."""
 
-try:
-    from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QPushButton
-    from PyQt6.QtCore import Qt, pyqtSignal
-    from PyQt6.QtGui import QPixmap
-    ALIGN_CENTER = Qt.AlignmentFlag.AlignCenter
-except ImportError:
-    from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QPushButton
-    from PyQt5.QtCore import Qt, pyqtSignal
-    from PyQt5.QtGui import QPixmap
-    ALIGN_CENTER = Qt.AlignCenter
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QPushButton
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QPixmap
+ALIGN_CENTER = Qt.AlignCenter
 
 
 class VideoWidget(QFrame):
@@ -18,7 +12,7 @@ class VideoWidget(QFrame):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFrameShape(QFrame.Shape.StyledPanel)
+        self.setFrameShape(QFrame.StyledPanel)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6, 6, 6, 6)
 
@@ -49,8 +43,8 @@ class VideoWidget(QFrame):
         pix = QPixmap.fromImage(qimg)
         scaled = pix.scaled(
             self.lbl_canvas.size(),
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.FastTransformation
+            Qt.KeepAspectRatio,
+            Qt.FastTransformation
         )
         self.lbl_canvas.setPixmap(scaled)
         self.lbl_fps.setText(f"{fps:.1f} FPS")

@@ -1,11 +1,7 @@
 """Top action toolbar for robot connection, homing, and starting mission."""
 
-try:
-    from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
-    from PyQt6.QtCore import pyqtSignal
-except ImportError:
-    from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
-    from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
+from PyQt5.QtCore import pyqtSignal
 
 
 class ControlBarWidget(QFrame):

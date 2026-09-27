@@ -1,22 +1,20 @@
-/**:
-  ros__parameters:
-    # =====================================================================
-    # usb_cam Node Configuration  –  ASUS FHD webcam on /dev/video0
-    # =====================================================================
+# =====================================================================
+# usb_cam Node Configuration  –  ASUS FHD webcam on /dev/video0
+# =====================================================================
 
-    # V4L2 device path
-    video_device: "/dev/video0"
+# V4L2 device path
+video_device: "/dev/video0"
 
-    # Image dimensions & frame rate
-    image_width:  640
-    image_height: 480
-    framerate:    30.0
+# Image dimensions & frame rate
+image_width:  640
+image_height: 480
+framerate:    30.0
 
-    # Pixel format: request MJPG from V4L2, decode to RGB internally
-    pixel_format: "mjpeg2rgb"
+# Pixel format: yuyv or mjpeg
+pixel_format: "yuyv"
 
-    # V4L2 IO method – mmap is fastest and avoids frame copies
-    io_method: "mmap"
+# V4L2 IO method – mmap is fastest and avoids frame copies
+io_method: "mmap"
 
     # Camera frame id
     camera_frame_id: "camera_frame"

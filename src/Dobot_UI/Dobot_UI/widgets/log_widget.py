@@ -2,10 +2,7 @@
 
 from datetime import datetime
 
-try:
-    from PyQt6.QtWidgets import QGroupBox, QVBoxLayout, QHBoxLayout, QTextEdit, QPushButton
-except ImportError:
-    from PyQt5.QtWidgets import QGroupBox, QVBoxLayout, QHBoxLayout, QTextEdit, QPushButton
+from PyQt5.QtWidgets import QGroupBox, QVBoxLayout, QHBoxLayout, QTextEdit, QPushButton
 
 
 class LogWidget(QGroupBox):
